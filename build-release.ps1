@@ -1,4 +1,4 @@
-param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.2.0.zip'))
+param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.2.1.zip'))
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression

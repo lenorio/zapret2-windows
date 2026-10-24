@@ -254,10 +254,12 @@ try {
         $started = $true
     }
     Wait-NoWinws
+    $strategyNumber = 0
     foreach ($strategy in $catalog) {
+        $strategyNumber++
         if (@(Get-WinwsProcesses).Count -ne 0) { throw 'Another winws2.exe appeared during the test.' }
         $config = Join-Path $Root ('runtime\manual-' + $strategy.id + '.conf')
-        Write-Host "`nTesting $($strategy.source)..." -ForegroundColor Cyan
+        Write-Host "`n[$strategyNumber/$($catalog.Count)] Testing $($strategy.source)..." -ForegroundColor Cyan
         $startError = $null
         $targetResults = @()
         $score = 0
