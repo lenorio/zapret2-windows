@@ -1,0 +1,197 @@
+# Streaming и развлечения
+pusher.com
+live-video.net
+ttvnw.net
+twitch.tv
+jtvnw.net
+ext-twitch.tv
+
+# Российские сервисы
+mail.ru
+vk.com
+vk-cdn.net
+userapi.com
+vkuseraudio.net
+vkuservideo.net
+yandex.com
+yandex.ru
+yandex.kz
+ya.ru
+yastatic.net
+mts.ru
+sberbank.ru
+ozon.ru
+ozonusercontent.com
+wildberries.ru
+wbstatic.net
+boosty.to
+
+# Магазины
+citilink.ru
+dns-shop.ru
+
+# Gaming
+multimc.org
+lolz.live
+epicgames.com
+epicgames.dev
+epicgames.store
+unrealengine.com
+
+# Steam
+steamcommunity.com
+steampowered.com
+steamstatic.com
+steamgames.com
+steamstats.com
+steambroadcast.com
+steamusercontent.com
+valvesoftware.com
+valve.net
+steamserver.net
+steamcontent.com
+store.steampowered.com
+api.steampowered.com
+
+# Новости и IT
+habr.com
+3dnews.ru
+2ip.ru
+
+# Софт и железо
+nvidia.com
+nvidia.cn
+nvgs.nvidia.com
+nvgs.nvidia.cn
+microsoft.com
+microsoftonline.com
+live.com
+windows.net
+msftconnecttest.com
+msftncsi.com
+msi.com
+
+# CDN и инфраструктура
+akamaitechnologies.com
+akamaihd.net
+akamaiedge.net
+cloudfront.net
+amazonaws.com
+s3.amazonaws.com
+elasticbeanstalk.com
+
+# Донаты и платежи
+donationalerts.com
+tbank.ru
+tinkoff.ru
+
+# Perplexity AI
+perplexity.ai
+
+# GitHub
+github.com
+github.io
+githubusercontent.com
+raw.githubusercontent.com
+githubassets.com
+github-production-user-asset-6210df.s3.amazonaws.com
+objects.githubusercontent.com
+camo.githubusercontent.com
+avatars.githubusercontent.com
+cloud.githubusercontent.com
+user-images.githubusercontent.com
+gist.githubusercontent.com
+# GitHub Assets и CDN
+githubassets.com
+github.githubassets.com
+
+# Contentful CDN
+ctfassets.net
+images.ctfassets.net
+assets.ctfassets.net
+videos.ctfassets.net
+downloads.ctfassets.net
+
+
+
+# Проблемные сайты из жалоб пользователей
+soundcloud.com
+sndcdn.com
+reddit.com
+redd.it
+redditmedia.com
+redditstatic.com
+imgur.com
+gfycat.com
+giphy.com
+tenor.com
+
+# VRChat и Photon
+vrchat.com
+vrchat.cloud
+photonengine.io
+photonengine.com
+exitgames.com
+
+# Социальные сети
+instagram.com
+cdninstagram.com
+twitter.com
+x.com
+twimg.com
+twttr.net
+abs.twimg.com
+bsky.app
+bsky.social
+
+# Proton
+proton.me
+protonmail.com
+protonmail.ch
+mail.proton.me
+account.proton.me
+
+# Art и контент
+furaffinity.net
+sketchfab.com
+dragonfru.it
+
+# Поисковики
+search.brave.com
+brave.com
+
+# Online игры
+dmn.moe
+ns.photonengine.io
+
+# Ubisoft
+ubisoft.com
+ubi.com
+uplay.com
+
+# EA и Origin
+ea.com
+origin.com
+
+# Riot Games
+riotgames.com
+leagueoflegends.com
+valorant.com
+pvp.net
+
+# Другие проблемные
+animego.org
+4pda.to
+rutracker.org
+
+# Codex / OpenAI: never modify these destinations
+openai.com
+chatgpt.com
+oaistatic.com
+oaiusercontent.com
+oaistatsig.com
+openai.com.cdn.cloudflare.net
+livekit.cloud
+workos.com
+challenges.cloudflare.com
+gamedownloads-rockstargames-com.akamaized.net

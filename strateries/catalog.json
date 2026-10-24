@@ -1,0 +1,265 @@
+[
+  {
+    "id": "general-alt",
+    "source": "general (ALT).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000",
+      "--lua-desync=fakedsplit:pos=midsld:pattern=0x00:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000",
+      "--lua-desync=fakedsplit:pos=midsld:pattern=0x00:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt10",
+    "source": "general (ALT10).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt11",
+    "source": "general (ALT11).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_ts=-1000",
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_ts=-1000",
+      "--lua-desync=multisplit:pos=1:seqovl=664:seqovl_pattern=flow_sferum"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt12",
+    "source": "general (ALT12).bat",
+    "youtubeTls": [
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_ts=-1000",
+      "--lua-desync=multisplit:pos=1:seqovl=664:seqovl_pattern=flow_sferum"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt13",
+    "source": "general (ALT13).bat",
+    "youtubeTls": [
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=5:tcp_ts=-1000",
+      "--lua-desync=hostfakesplit:host=mail.ru:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt2",
+    "source": "general (ALT2).bat",
+    "youtubeTls": [
+      "--lua-desync=multisplit:pos=2:seqovl=652:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=multisplit:pos=2:seqovl=652:seqovl_pattern=flow_google"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt3",
+    "source": "general (ALT3).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=1:tcp_ts=-1000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=1:tcp_ts=-1000:tls_mod=rnd,dupsid,sni=ya.ru",
+      "--lua-desync=hostfakesplit:host=ya.ru:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt4",
+    "source": "general (ALT4).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000",
+      "--lua-desync=multisplit:pos=1"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000",
+      "--lua-desync=multisplit:pos=1"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt5",
+    "source": "general (ALT5).bat",
+    "youtubeTls": [
+      "--lua-desync=syndata:blob=flow_google:tcp_md5",
+      "--lua-desync=multidisorder:pos=midsld"
+    ],
+    "generalTls": [
+      "--lua-desync=syndata:blob=flow_google:tcp_md5",
+      "--lua-desync=multidisorder:pos=midsld"
+    ],
+    "note": "IPv4-wide SYN strategy reduced to hostlist-scoped TLS profile."
+  },
+  {
+    "id": "general-alt6",
+    "source": "general (ALT6).bat",
+    "youtubeTls": [
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt7",
+    "source": "general (ALT7).bat",
+    "youtubeTls": [
+      "--lua-desync=multisplit:pos=2,sniext+1:seqovl=679:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=multisplit:pos=2,sniext+1:seqovl=679:seqovl_pattern=flow_google"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt8",
+    "source": "general (ALT8).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000:tls_mod=none"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000:tls_mod=none"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-alt9",
+    "source": "general (ALT9).bat",
+    "youtubeTls": [
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=hostfakesplit:host=ozon.ru:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-exp",
+    "source": "general (EXP).bat",
+    "youtubeTls": [
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=4:tcp_ts=-1000",
+      "--lua-desync=multisplit:pos=1:seqovl=480:seqovl_pattern=flow_stun2"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-fake-tls-auto-alt",
+    "source": "general (FAKE TLS AUTO ALT).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=fakedsplit:pos=midsld:pattern=0x00:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=fakedsplit:pos=midsld:pattern=0x00:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-fake-tls-auto-alt2",
+    "source": "general (FAKE TLS AUTO ALT2).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-fake-tls-auto-alt3",
+    "source": "general (FAKE TLS AUTO ALT3).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_ts=-1000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=8:tcp_ts=-1000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-fake-tls-auto",
+    "source": "general (FAKE TLS AUTO).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=11:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multidisorder:pos=1,midsld"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=11:tcp_seq=-10000:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multidisorder:pos=1,midsld"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-simple-fake-alt",
+    "source": "general (SIMPLE FAKE ALT).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_seq=-10000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-simple-fake-alt2",
+    "source": "general (SIMPLE FAKE ALT2).bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general-simple-fake",
+    "source": "general (SIMPLE FAKE).bat",
+    "youtubeTls": [
+      "--lua-desync=hostfakesplit:host=www.google.com:tcp_ts=-1000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=flow_google:repeats=6:tcp_ts=-1000"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "general",
+    "source": "general.bat",
+    "youtubeTls": [
+      "--lua-desync=multisplit:pos=1:seqovl=681:seqovl_pattern=flow_google"
+    ],
+    "generalTls": [
+      "--lua-desync=multisplit:pos=1:seqovl=568:seqovl_pattern=flow_4pda"
+    ],
+    "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  }
+]
