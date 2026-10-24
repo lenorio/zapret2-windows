@@ -1,4 +1,4 @@
-param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.1.1.zip'))
+param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.2.0.zip'))
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression
@@ -15,7 +15,9 @@ try {
     try {
         $files = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
             $relative = $_.FullName.Substring($root.Length + 1).Replace('\', '/')
-            $relative -notmatch '^(\.git|runtime)/' -and $relative -notmatch '\.(log|tmp)$'
+            $relative -notmatch '^(\.git|runtime)/' -and
+            $relative -notmatch '^strategies/test results/' -and
+            $relative -notmatch '\.(log|tmp)$'
         })
         foreach ($file in $files) {
             $relative = $file.FullName.Substring($root.Length + 1).Replace('\', '/')

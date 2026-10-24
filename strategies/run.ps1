@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$StrategyId,
-    [switch]$RenderOnly
+    [switch]$RenderOnly,
+    [switch]$Quiet
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,17 +17,23 @@ foreach ($path in @($binary, (Join-Path $PSScriptRoot 'base.conf.in'),
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing file: $path" }
 }
 
-$template = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'base.conf.in') -Raw -Encoding UTF8
-$configText = $template.Replace('{{ROOT}}', $root).
-    Replace('{{YOUTUBE_TLS}}', ($strategy.youtubeTls -join "`r`n")).
-    Replace('{{GENERAL_TLS}}', ($strategy.generalTls -join "`r`n"))
+$templateName = if ($strategy.configTemplate) { [string]$strategy.configTemplate } else { 'base.conf.in' }
+if ($templateName -notmatch '^[a-zA-Z0-9_-]+\.conf\.in$') { throw 'Invalid config template name.' }
+$template = Get-Content -LiteralPath (Join-Path $PSScriptRoot $templateName) -Raw -Encoding UTF8
+$configText = $template.Replace('{{ROOT}}', $root)
+if (-not $strategy.configTemplate) {
+    $configText = $configText.Replace('{{YOUTUBE_TLS}}', ($strategy.youtubeTls -join "`r`n")).
+        Replace('{{GENERAL_TLS}}', ($strategy.generalTls -join "`r`n"))
+}
 if ($configText -match '\{\{[^}]+\}\}') { throw 'Config contains an unresolved placeholder.' }
 $runtime = Join-Path $root 'runtime'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $config = Join-Path $runtime ("manual-$StrategyId.conf")
 [IO.File]::WriteAllText($config, $configText, [Text.UTF8Encoding]::new($false))
-Write-Host "Strategy: $($strategy.source)"
-Write-Host "Config: $config"
+if (-not $Quiet) {
+    Write-Host "Strategy: $($strategy.source)"
+    Write-Host "Config: $config"
+}
 if ($RenderOnly) { return }
 
 $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())

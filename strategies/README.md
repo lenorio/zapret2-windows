@@ -2,7 +2,8 @@
 
 This folder contains the manual Flowseal-inspired strategy launchers.
 
-The 22 launchers are named after Flowseal's `general*.bat` variants. Each
+The 22 Flowseal launchers are named after its `general*.bat` variants. Three
+baseline variants and `current-custom.bat` are included too. Each
 launcher starts this project's `winws2.exe` in its foreground console, without
 installing autostart. Stop it with Ctrl+C. The runner refuses to start when
 another `winws2.exe` process is present; it never stops that process itself.
@@ -19,4 +20,11 @@ candidate strategies, not claims of identical behavior or network success.
 `run.ps1 -StrategyId <id> -RenderOnly` generates a config without starting
 WinDivert, useful for inspection. Generated configs are placed in `runtime/`.
 No Python or other runtime is required on the user's computer.
+
+`targets.txt` uses `Name = "https://host"` or `Name = "PING:address"` lines.
+The manager's test option runs every entry in `catalog.json` against those
+targets and checks HTTP, TLS 1.2, TLS 1.3 and ping. Reports are saved to
+`test results/test_results_YYYY-MM-DD_HH-mm-ss.txt`. Ping is diagnostic;
+successful HTTP/TLS checks determine the recommendation. Testing does not
+select or install a strategy. The original bypass is restored afterward.
 

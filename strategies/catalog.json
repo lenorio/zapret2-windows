@@ -261,5 +261,49 @@
       "--lua-desync=multisplit:pos=1:seqovl=568:seqovl_pattern=flow_4pda"
     ],
     "note": "TLS techniques converted; common HTTP, QUIC and Minecraft profiles preserved."
+  },
+  {
+    "id": "split-overlap",
+    "source": "split-overlap.bat",
+    "youtubeTls": [
+      "--lua-desync=multisplit:pos=1,midsld:seqovl=5:seqovl_pattern=0x1603030000"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=fake_default_tls:tcp_md5:tcp_seq=-10000:repeats=6",
+      "--lua-desync=multidisorder:pos=midsld"
+    ],
+    "note": "Split + overlap (current working profile)"
+  },
+  {
+    "id": "fake-zero-split",
+    "source": "fake-zero-split.bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=0x00000000:tcp_md5:repeats=6",
+      "--lua-desync=multisplit:pos=1,midsld"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=fake_default_tls:tcp_md5:tcp_seq=-10000:repeats=6",
+      "--lua-desync=multidisorder:pos=midsld"
+    ],
+    "note": "Fake zero + split"
+  },
+  {
+    "id": "fake-sni-disorder",
+    "source": "fake-sni-disorder.bat",
+    "youtubeTls": [
+      "--lua-desync=fake:blob=fake_default_tls:tcp_md5:repeats=11:tls_mod=rnd,dupsid,sni=www.google.com",
+      "--lua-desync=multidisorder:pos=1,midsld"
+    ],
+    "generalTls": [
+      "--lua-desync=fake:blob=fake_default_tls:tcp_md5:tcp_seq=-10000:repeats=6",
+      "--lua-desync=multidisorder:pos=midsld"
+    ],
+    "note": "Fake SNI + disorder"
+  },
+  {
+    "id": "current-custom",
+    "source": "current-custom.bat",
+    "configTemplate": "current-custom.conf.in",
+    "note": "Snapshot of the active C:\\zapret2\\runtime\\active.conf profile."
   }
 ]

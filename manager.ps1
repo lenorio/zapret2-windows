@@ -9,7 +9,7 @@ $TaskName = 'Zapret2-Windows'
 $Binary = Join-Path $Root 'bin\winws2.exe'
 $ActiveConfig = Join-Path $Root 'runtime\active.conf'
 $StateFile = Join-Path $Root 'runtime\state.json'
-$Strategies = Get-Content -LiteralPath (Join-Path $Root 'strategies.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$Strategies = Get-Content -LiteralPath (Join-Path $Root 'strategies\catalog.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 
 function Get-Strategy([string]$Id) {
     $match = @($Strategies | Where-Object { $_.id -eq $Id })
@@ -19,8 +19,14 @@ function Get-Strategy([string]$Id) {
 
 function Get-ConfigText([string]$Id) {
     $strategy = Get-Strategy $Id
-    $template = Get-Content -LiteralPath (Join-Path $Root 'config\base.conf.in') -Raw -Encoding UTF8
-    $text = $template.Replace('{{ROOT}}', $Root).Replace('{{YOUTUBE_TLS}}', ($strategy.youtubeTls -join "`r`n"))
+    $templateName = if ($strategy.configTemplate) { [string]$strategy.configTemplate } else { 'base.conf.in' }
+    if ($templateName -notmatch '^[a-zA-Z0-9_-]+\.conf\.in$') { throw 'Invalid config template name.' }
+    $template = Get-Content -LiteralPath (Join-Path $Root ('strategies\' + $templateName)) -Raw -Encoding UTF8
+    $text = $template.Replace('{{ROOT}}', $Root)
+    if (-not $strategy.configTemplate) {
+        $text = $text.Replace('{{YOUTUBE_TLS}}', ($strategy.youtubeTls -join "`r`n")).
+            Replace('{{GENERAL_TLS}}', ($strategy.generalTls -join "`r`n"))
+    }
     if ($text -match '\{\{[^}]+\}\}') { throw 'Config has unresolved placeholders.' }
     return $text
 }
@@ -32,7 +38,8 @@ function Test-Package {
         'data\windivert_part.quic_initial_ietf.txt',
         'data\quic_initial_www_google_com.bin', 'data\minecraft-seqovl.bin',
         'lists\list-youtube.txt', 'lists\list-all-safe.txt', 'lists\list-exclude-safe.txt',
-        'config\base.conf.in', 'strategies.json'
+        'strategies\base.conf.in', 'strategies\catalog.json',
+        'strategies\targets.txt', 'strategies\test.ps1'
     )
     $missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $Root $_) -PathType Leaf) })
     if ($missing.Count) { throw ('Missing files: ' + ($missing -join ', ')) }
@@ -42,7 +49,14 @@ function Test-Package {
         if ($exclusions -notcontains $domain) { throw "Missing Codex exclusion: $domain" }
     }
     foreach ($strategy in $Strategies) {
-        if (-not $strategy.id -or @($strategy.youtubeTls).Count -lt 1) { throw 'Invalid strategy entry.' }
+        if (-not $strategy.id -or -not $strategy.source -or
+            (-not $strategy.configTemplate -and
+             (@($strategy.youtubeTls).Count -lt 1 -or @($strategy.generalTls).Count -lt 1))) {
+            throw 'Invalid strategy entry.'
+        }
+        if (-not (Test-Path -LiteralPath (Join-Path $Root ('strategies\' + $strategy.source)) -PathType Leaf)) {
+            throw "Missing launcher: $($strategy.source)"
+        }
         [void](Get-ConfigText $strategy.id)
     }
     return $true
@@ -113,6 +127,14 @@ function Wait-Task([string]$Wanted) {
     throw "Task did not enter $Wanted state."
 }
 
+function Wait-NoWinws {
+    for ($i = 0; $i -lt 40; $i++) {
+        if (@(Get-WinwsProcesses).Count -eq 0) { return }
+        Start-Sleep -Milliseconds 250
+    }
+    throw 'winws2.exe did not stop.'
+}
+
 function Confirm-Plan([string]$Action, [string]$Rollback) {
     Write-Host "Action: $Action" -ForegroundColor Yellow
     Write-Host "Rollback: $Rollback" -ForegroundColor Yellow
@@ -127,7 +149,7 @@ function Show-Status {
     } else {
         Write-Host 'Bypass (winws2.exe) is NOT RUNNING.'
     }
-    Write-Host "Strategy: $($state.active)"
+    Write-Host "Current strategy: $($state.active)"
     Write-Host "Autostart task: $(if ($task) { $task.State } else { 'not installed' })"
     Write-Host "winws2 processes: $(@(Get-WinwsProcesses).Count)"
     if ($state.recommended) { Write-Host "Last recommendation: $($state.recommended)" }
@@ -137,8 +159,9 @@ function Show-Strategies {
     $state = Get-State
     foreach ($item in $Strategies) {
         $mark = if ($item.id -eq $state.active) { '*' } else { ' ' }
-        Write-Host " $mark $($item.id.PadRight(20)) $($item.name)"
+        Write-Host " $mark $($item.id.PadRight(24)) $($item.source)"
     }
+    Write-Host '* = selected in service; current-custom = snapshot of original active.conf'
 }
 
 function Install-Autostart {
@@ -195,82 +218,9 @@ function Remove-Autostart {
     Write-Host 'Autostart removed.' -ForegroundColor Green
 }
 
-function Invoke-Probe([string]$Url) {
-    $ErrorActionPreference = 'Continue'
-    $timer = [Diagnostics.Stopwatch]::StartNew()
-    $output = & curl.exe --noproxy '*' --http1.1 -I -L -sS -o NUL -w '%{http_code}' --connect-timeout 4 --max-time 9 $Url 2>$null
-    $exitCode = $LASTEXITCODE
-    $timer.Stop()
-    $code = [string]($output | Select-Object -Last 1)
-    return [pscustomobject]@{
-        url = $Url
-        ok = ($exitCode -eq 0 -and $code -match '^[234]\d\d$')
-        code = $code
-        exitCode = $exitCode
-        ms = $timer.ElapsedMilliseconds
-    }
-}
-
 function Test-Strategies {
     [void](Test-Package)
-    Assert-NoOtherWinws
-    Assert-NoOtherAutostart
-    $task = Get-ManagedTask
-    $wasRunning = ($task -and $task.State -eq 'Running')
-    if (-not (Confirm-Plan 'Temporarily stop the managed task, test three candidate YouTube TLS profiles, then restore its original state.' 'The finally block stops test processes and restarts the original task if it was running. The active configuration is unchanged.')) { return }
-    $results = [System.Collections.Generic.List[object]]::new()
-    $targets = @('https://www.youtube.com/', 'https://i.ytimg.com/', 'https://www.google.com/', 'https://discord.com/')
-    try {
-        if ($wasRunning) { Stop-ScheduledTask -TaskName $TaskName; Wait-Task 'Ready' }
-        if (@(Get-WinwsProcesses).Count -ne 0) { throw 'A winws2 process remained after stopping the task.' }
-        foreach ($strategy in $Strategies) {
-            $candidatePath = Join-Path $Root ('runtime\candidate-' + $strategy.id + '.conf')
-            Write-Config $strategy.id $candidatePath
-            Write-Host "`nTesting $($strategy.id)..." -ForegroundColor Cyan
-            $process = $null
-            try {
-                $process = Start-Process -FilePath $Binary -ArgumentList ('@"' + $candidatePath + '"') -PassThru -WindowStyle Hidden
-                Start-Sleep -Milliseconds 1500
-                $process.Refresh()
-                if ($process.HasExited) { throw "Candidate exited with code $($process.ExitCode)." }
-                $probes = @($targets | ForEach-Object { Invoke-Probe $_ })
-                $score = @($probes | Where-Object { $_.ok }).Count
-                $ms = ($probes | Measure-Object -Property ms -Sum).Sum
-                foreach ($probe in $probes) {
-                    Write-Host "  $($probe.url): $(if ($probe.ok) { 'OK' } else { 'FAIL' }) HTTP $($probe.code), $($probe.ms) ms"
-                }
-                $results.Add([pscustomobject]@{ id = $strategy.id; score = $score; total = $probes.Count; ms = $ms; probes = $probes })
-            } catch {
-                Write-Host "  Failed: $($_.Exception.Message)" -ForegroundColor Red
-                $results.Add([pscustomobject]@{ id = $strategy.id; score = 0; total = $targets.Count; ms = 999999; error = $_.Exception.Message })
-            } finally {
-                if ($process) {
-                    $process.Refresh()
-                    if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue }
-                    [void]$process.WaitForExit(5000)
-                }
-                Start-Sleep -Milliseconds 500
-            }
-        }
-        $state = Get-State
-        $ranked = @($results | Sort-Object @{Expression = { -$_.score }}, @{Expression = { if ($_.id -eq $state.active) { 0 } else { 1 } }}, @{Expression = { $_.ms }})
-        $best = if ($ranked.Count -and $ranked[0].score -gt 0) { $ranked[0].id } else { $null }
-        $state.recommended = $best
-        Save-State $state
-        $report = Join-Path $Root ('runtime\results-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.json')
-        $results | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $report -Encoding UTF8
-        Write-Host "`nRecommended: $(if ($best) { $best } else { 'none' })"
-        Write-Host "Report: $report"
-        Write-Host 'HTTP reachability is only a first check. Verify video playback and Codex after applying.'
-    } finally {
-        if (@(Get-WinwsProcesses).Count -ne 0) {
-            Write-Warning 'A winws2 process remains; original task was not restarted to avoid a conflict.'
-        } elseif ($wasRunning) {
-            Start-ScheduledTask -TaskName $TaskName
-            Wait-Task 'Running'
-            Write-Host 'Original task restored.' -ForegroundColor Green
-        }
-    }
+    & (Join-Path $Root 'strategies\test.ps1') -Root $Root
 }
 
 function Select-Strategy {
@@ -279,36 +229,83 @@ function Select-Strategy {
     $id = Read-Host 'Strategy ID'
     [void](Get-Strategy $id)
     $task = Get-ManagedTask
-    Assert-NoOtherWinws
-    if (-not (Confirm-Plan "Select $id and restart the managed task if running." 'The previous active.conf is backed up; if restart fails, it is restored. Select the old ID to revert later.')) { return }
+    $processes = @(Get-WinwsProcesses)
+    if ($processes.Count -gt 1) { throw 'Multiple winws2.exe processes exist. Refusing to switch.' }
+    $originalArgument = $null
+    if ($processes.Count -eq 1) {
+        $process = $processes[0]
+        if (-not $process.ExecutablePath -or $process.ExecutablePath -ine $Binary -or
+            -not $process.CommandLine -or $process.CommandLine -notmatch '@"([^"]+)"') {
+            throw 'Cannot verify the current winws2.exe and its config. Refusing to switch.'
+        }
+        $originalConfig = [IO.Path]::GetFullPath($Matches[1])
+        if (-not $originalConfig.StartsWith($Root + '\', [StringComparison]::OrdinalIgnoreCase) -or
+            -not (Test-Path -LiteralPath $originalConfig -PathType Leaf)) {
+            throw 'Current winws2.exe config is outside this installation or missing.'
+        }
+        $originalArgument = '@"' + $originalConfig + '"'
+    }
+    $taskWasRunning = [bool]($task -and $task.State -eq 'Running')
+    if (-not (Confirm-Plan "Select $id and restart the current bypass if running." 'The previous active.conf and strategy selection are backed up. On failure, the original task or process is restored.')) { return }
     $state = Get-State
     $oldId = $state.active
     $backup = Join-Path $Root 'runtime\active.previous.conf'
     if (Test-Path -LiteralPath $ActiveConfig) { Copy-Item -LiteralPath $ActiveConfig -Destination $backup -Force }
+    $startedProcess = $null
+    $stoppedOriginal = $false
     try {
         Write-Config $id $ActiveConfig
-        if ($task -and $task.State -eq 'Running') {
+        if ($taskWasRunning) {
             Stop-ScheduledTask -TaskName $TaskName
+            $stoppedOriginal = $true
             Wait-Task 'Ready'
+            Wait-NoWinws
             Start-ScheduledTask -TaskName $TaskName
             Wait-Task 'Running'
+        } elseif ($processes.Count -eq 1) {
+            Stop-Process -Id $process.ProcessId -Force
+            $stoppedOriginal = $true
+            Wait-NoWinws
+            $startedProcess = Start-Process -FilePath $Binary -ArgumentList ('@"' + $ActiveConfig + '"') -PassThru -WindowStyle Hidden
+            Start-Sleep -Milliseconds 1200
+            $startedProcess.Refresh()
+            if ($startedProcess.HasExited) { throw "Selected strategy exited with code $($startedProcess.ExitCode)." }
         }
         $state.active = $id
         Save-State $state
         Write-Host "Selected: $id" -ForegroundColor Green
     } catch {
+        $selectionError = $_
+        if ($startedProcess) {
+            $startedProcess.Refresh()
+            if (-not $startedProcess.HasExited) { Stop-Process -Id $startedProcess.Id -Force -ErrorAction SilentlyContinue }
+        }
+        if ($taskWasRunning -and (Get-ManagedTask).State -eq 'Running') {
+            Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+        }
+        try { Wait-NoWinws } catch { Write-Warning $_.Exception.Message }
         if (Test-Path -LiteralPath $backup) { Copy-Item -LiteralPath $backup -Destination $ActiveConfig -Force }
         $state.active = $oldId
         Save-State $state
-        if ($task -and (Get-ManagedTask).State -ne 'Running') {
-            Start-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+        if ($stoppedOriginal -and @(Get-WinwsProcesses).Count -eq 0) {
+            if ($taskWasRunning) {
+                Start-ScheduledTask -TaskName $TaskName
+                Wait-Task 'Running'
+            } elseif ($originalArgument) {
+                $restored = Start-Process -FilePath $Binary -ArgumentList $originalArgument -PassThru -WindowStyle Hidden
+                Start-Sleep -Milliseconds 1200
+                $restored.Refresh()
+                if ($restored.HasExited) { throw 'Failed to restore the original bypass process.' }
+            }
         }
-        throw
+        throw $selectionError
     }
 }
 
 function Show-Menu {
     Write-Host 'ZAPRET2 WINDOWS MANAGER'
+    $state = Get-State
+    Write-Host "Current strategy: $($state.active)" -ForegroundColor Cyan
     Write-Host ''
     Write-Host '------------------------------------------'
     Write-Host ''
@@ -320,7 +317,7 @@ function Show-Menu {
     Write-Host '   5. Check status'
     Write-Host ''
     Write-Host ':: STRATEGIES'
-    Write-Host '   6. Test all strategies'
+    Write-Host '   6. Test all strategies (strategies/targets.txt)'
     Write-Host '   7. Show strategies'
     Write-Host '   8. Select strategy'
     Write-Host ''

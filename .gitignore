@@ -1,4 +1,5 @@
 /runtime/
+/strategies/test results/
 *.log
 *.zip
 !third_party/source/*.zip
