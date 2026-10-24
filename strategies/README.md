@@ -1,6 +1,6 @@
 # Manual strategies
 
-This directory name intentionally follows the requested `/strateries` spelling.
+This folder contains the manual Flowseal-inspired strategy launchers.
 
 The 22 launchers are named after Flowseal's `general*.bat` variants. Each
 launcher starts this project's `winws2.exe` in its foreground console, without
@@ -19,3 +19,4 @@ candidate strategies, not claims of identical behavior or network success.
 `run.ps1 -StrategyId <id> -RenderOnly` generates a config without starting
 WinDivert, useful for inspection. Generated configs are placed in `runtime/`.
 No Python or other runtime is required on the user's computer.
+

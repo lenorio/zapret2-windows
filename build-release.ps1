@@ -1,4 +1,4 @@
-param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.1.0.zip'))
+param([string]$Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'zapret2-windows-v0.1.1.zip'))
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression
@@ -29,3 +29,4 @@ try {
     } finally { $zip.Dispose() }
 } finally { $stream.Dispose() }
 Write-Host "Created $outputPath with $($files.Count) files"
+
